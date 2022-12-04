@@ -17,20 +17,20 @@ subsets = 0
 overlap = 0
 
 for pair in input:
-    p1_start, p1_end = int(pair.split(' ')[0]), int(pair.split(' ')[1])
-    p2_start, p2_end = int(pair.split(' ')[2]), int(pair.split(' ')[3])
-    p1 = set()
-    p2 = set()
+    min1, max1 = int(pair.split(' ')[0]), int(pair.split(' ')[1])
+    min2, max2 = int(pair.split(' ')[2]), int(pair.split(' ')[3])
+    # p1 = set()
+    # p2 = set()
 
-    for i in range(p1_start, p1_end + 1):
-        p1.add(i)
-    for i in range(p2_start, p2_end + 1):
-        p2.add(i)
+    # for i in range(min1, max1 + 1):
+    #     p1.add(i)
+    # for i in range(min2, max2 + 1):
+    #     p2.add(i)
 
-    if (p1.issubset(p2) or p2.issubset(p1)):
+    if ((min1 <= min2 and max1>= max2) or (min2 <= min1 and max2>= max1)):
         subsets += 1
 
-    if (len(p1.intersection(p2)) != 0):
+    if (not (max1 < min2 or max2 < min1)):
         overlap += 1
 
 print(subsets)
