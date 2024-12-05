@@ -12,3 +12,6 @@ def getInput(day):
         return open("inputs/test.txt", "r").read().splitlines()
     else:
         return open(f"inputs/day{day_pad}.txt", "r").read().splitlines()
+
+def check2DBounds(inputs, x, y):
+    return y >= 0 and y < len(inputs) and x >= 0 and x < len(inputs[y])
