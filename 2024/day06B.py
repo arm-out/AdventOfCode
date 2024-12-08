@@ -2,62 +2,44 @@ from utils import getInput
 from collections import defaultdict
 
 inputs = getInput(6)
-g = [list(x) for x in inputs]
-ans = res = 0
+grid = [list(x) for x in inputs]
+rows = len(grid)
+cols = len(grid[0])
 
-n,m = len(g),len(g[0])
+for r in range(rows):
+    for c in range(cols):
+        if grid[r][c] == '^': break
+    else:
+        continue
+    break
 
-ix,iy = 0,0
-for x in range(n):
-    for y in range(m):
-        if g[x][y] in "><^v":
-            #print(g[x][y])
-            ix,iy = x,y
+path = set()
+def loops(r, c, initial=False):
+    dr = -1
+    dc = 0
+    visited = set()
 
-dirs = [(-1,0), (0,1), (1,0), (0,-1)]
-
-cx, cy, cd = ix, iy, 0
-seen = set()
-while cx in range(n) and cy in range(m):
-    seen.add((cx,cy))
     while True:
-        cdir = dirs[cd]
-        nx,ny = cx + cdir[0], cy + cdir[1]
-        if nx in range(n) and ny in range(m) and g[nx][ny] == "#":
-            cd = (cd + 1) % 4
+        visited.add((r, c, dr, dc))
+        if initial: path.add((r, c))
+        if r + dr < 0 or r + dr >= rows or c + dc < 0 or c + dc >= cols:
+            return False
+        if grid[r + dr][c + dc] == '#':
+            dc, dr = -dr, dc
         else:
-            cx,cy = nx,ny
-            break
-print(len(seen))
+            c += dc
+            r += dr
+        if (r, c, dr, dc) in visited:
+            return True
 
-#g2 = [[y for y in r] for r in g]
+# get initial path
+loops(r, c, True)
+total = 0
+for p in path:
+    if grid[p[0]][p[1]] == '^': continue
+    grid[p[0]][p[1]] = '#'
+    if loops(r, c):
+        total += 1
+    grid[p[0]][p[1]] = '.'
 
-for ox in range(n):
-    #print(ox)
-    for oy in range(m):
-        if g[ox][oy] == "#" or g[ox][oy] == "^":
-            continue
-
-        g[ox][oy] = "#"
-        
-        seen = set()
-        cd = 0
-        cx, cy = ix, iy
-        while cx in range(n) and cy in range(m) and (cx,cy,cd) not in seen:
-            seen.add((cx,cy,cd))
-            while True:
-                cdir = dirs[cd]
-                nx,ny = cx + cdir[0], cy + cdir[1]
-                if nx in range(n) and ny in range(m) and g[nx][ny] == "#":
-                    cd = (cd + 1) % 4
-                else:
-                    cx,cy = nx,ny
-                    break
-
-        if (cx,cy,cd) in seen:
-            ans += 1
-            #g2[ox][oy] = "?"
-
-        g[ox][oy] = "."
-
-print(ans)
+print(total)
