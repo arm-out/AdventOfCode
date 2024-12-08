@@ -2,32 +2,22 @@ from utils import getInput
 from collections import defaultdict
 
 inputs = getInput(7)
+
+def can_obtain(target, array):
+    if len(array) == 1: return target == array[0]
+    if target % array[-1] == 0 and can_obtain(target // array[-1], array[:-1]): return True
+    if target > array[-1] and can_obtain(target - array[-1], array[:-1]): return True
+    s_target = str(target)
+    s_last = str(array[-1])
+    if len(s_target) > len(s_last) and s_target.endswith(s_last) and can_obtain(int(s_target[:-len(s_last)]), array[:-1]): return True
+    return False
+
 res = 0
-
 for line in inputs:
-    total = int(line.split(":")[0])
-    parts = [int(x) for x in line.split(":")[1].split(" ")[1:]]
-
-    def backtrack(i, cur):
-        if i == len(parts):
-            return cur == total
-
-        # Addition
-        if backtrack(i + 1, cur + parts[i]):
-            return True
-        
-        # Multiplication
-        if backtrack(i + 1, cur * parts[i]):
-            return True
-        
-        # Concatenation
-        concat = int(str(cur) + str(parts[i]))
-        if backtrack(i + 1, concat):
-            return True
-        
-        return False
-
-    if backtrack(1, parts[0]):
+    left, right = line.split(":")
+    total = int(left)
+    parts = [int(x) for x in right.split()]
+    if can_obtain(total, parts):
         res += total
-
+    
 print(res)
