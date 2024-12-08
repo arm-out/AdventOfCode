@@ -1,50 +1,39 @@
 from utils import getInput
-from collections import defaultdict
+from functools import cmp_to_key
 
 inputs = getInput(5)
+rules = []
+updates = []
 
-pivot = inputs.index('')
-rules = inputs[:pivot]
-updates = inputs[pivot+1:]
+done_rules = False
+for line in inputs:
+    if len(line) == 0:
+        done_rules = True
+        continue
+    if not done_rules: rules.append(list(map(int, line.split('|'))))
+    if done_rules: updates.append(list(map(int, line.split(','))))
 
-rule_table = defaultdict(list)
-for rule in rules:
-    parts = rule.split('|')
-    rule_table[parts[0].strip()].append(parts[1].strip())
+cache = {}
 
-correct = []
-incorrect = []
+for x, y in rules:
+    cache[(x, y)] = -1
+    cache[(y, x)] = 1
+
+def isOrdered(update):
+    for i in range(len(update)):
+        for j in range(i+1, len(update)):
+            key = (update[i], update[j])
+            if key in cache and cache[key] == 1:
+                return False
+    return True
+
+def cmp(x,y):
+    return cache[(x,y)]
+
+total = 0
 for update in updates:
-    pages = update.split(',')
-    so_far = []
-    for i, p in enumerate(pages):
-        prereqs = rule_table[p]
-        if any(x in so_far for x in prereqs):
-            incorrect.append(update)
-            break
-        
-        so_far.append(pages[i])
-        if i == len(pages) - 1:
-            correct.append(update)
+    if isOrdered(update): continue
+    update.sort(key=cmp_to_key(cmp))
+    total += update[len(update)//2]
 
-ans = []
-for c in incorrect:
-    pages = c.split(',')
-
-    i = 0
-    while i < len(pages):
-
-        prereqs = rule_table[pages[i]]
-        while any(x in pages[:i] for x in prereqs):
-            p = pages.pop(i)
-            pages.insert(0, p)
-            i = 0
-        i += 1
-    
-    ans.append(pages)
-
-ans_sum = 0
-for a in ans:
-    ans_sum += int(a[len(a)//2])
-
-print(ans_sum)
+print(total)
