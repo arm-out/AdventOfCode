@@ -5,9 +5,11 @@ inputs = getInput(18)
 inputs =[list(map(int, x.split(','))) for x in inputs]
 dim = 71
 
-grid = [['.' for _ in range(dim)] for _ in range(dim)]
+def bfs(n):
+    grid = [['.' for _ in range(dim)] for _ in range(dim)]
+    for r, c in inputs[:n]:
+        grid[r][c] = '#'
 
-def bfs():
     q = deque()
     seen = set([(0, 0)])
     prev = {(0,0): None}
@@ -23,8 +25,12 @@ def bfs():
                 prev[(nr, nc)] = (r, c)
                 q.append((nr, nc))
 
-for i, (r, c) in enumerate(inputs):
-    grid[r][c] = '#'
-    if not bfs():
-        print(inputs[i])
-        break
+l, r = 0, len(inputs) - 1
+while l <= r:
+    mid = (l + r) // 2
+    if bfs(mid + 1):
+        l = mid + 1
+    else:
+        r = mid - 1
+
+print(inputs[max(l, r)])
